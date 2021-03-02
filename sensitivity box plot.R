@@ -12,15 +12,14 @@ cell_line_info <- select(cell_line_info, DepMap_ID, stripped_cell_line_name, pri
 LFC$cancer_type <- cell_line_info$primary_disease[match(rownames(LFC), cell_line_info$DepMap_ID)]
 LFC <- LFC %>% select(cancer_type, everything())
 
-Drug_LFC <- LFC %>% select(cancer_type, 
-                           treatment.info$broad_id[match("duloxetine", treatment.info$name)])
-Drug_LFC <-  rename(Drug_LFC,"LFC.value" =`BRD-K71103788-003-12-0` )
+drug_id <- treatment.info$broad_id[match("duloxetine", treatment.info$name)]
+Drug_LFC <- LFC %>% select(cancer_type, all_of(drug_id))
+
+Drug_LFC <-  rename(Drug_LFC,"LFC.value" =drug_id)
 Drug_LFC <- Drug_LFC %>% rownames_to_column("gene") %>% 
   filter(cancer_type != "Engineered" |!is.na(cancer_type)) %>% 
   column_to_rownames("gene")
 Drug_LFC <- Drug_LFC %>% na.omit()
-#Drug_AUC$PorM <- cell_line_info$primary_or_metastasis[match(Drug_AUC$depmap_id, cell_line_info$DepMap_ID)]
-#Drug_AUC <- Drug_AUC %>% filter(cancer_type != "UNABLE TO CLASSIFY")
 ggplot(iris, aes(x = reorder(Species, Sepal.Width, FUN = median), y = Sepal.Width)) + geom_boxplot()
 ggplot(iris, aes(x = Species, y = Sepal.Width)) + geom_boxplot()
 
@@ -114,8 +113,7 @@ TNBC <- cell_line_info %>% filter(lineage_sub_subtype == "ERneg_HER2neg")
 cancer_LFC <- Drug_LFC %>% rownames_to_column("gene") %>% 
   filter(rownames(Drug_LFC) %in% TNBC$DepMap_ID) %>% 
   column_to_rownames("gene")
-#gene_signature <- read_csv("D:/Winnie/Depmap/raw data/CCLE_mutation_Winnie_full.csv")
-#gene_signature <- gene_signature %>% column_to_rownames("X1")
+
 cancer_signature <- gene_signature %>% select(rownames(cancer_LFC))
 
 biomarker <- data.frame(gene = rownames(cancer_signature), wilcox= NA)
