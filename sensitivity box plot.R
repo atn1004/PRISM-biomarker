@@ -1,12 +1,12 @@
 rm(list = ls())
 library(tidyverse)
-LFC <- read_csv("D:/Winnie/Depmap/raw data/primary-screen-replicate-collapsed-logfold-change.csv") %>% as.data.frame()
-treatment.info <- read_csv("D:/Winnie/Depmap/raw data/primary-screen-replicate-collapsed-treatment-info.csv")%>% as.data.frame()
+LFC <- read_csv("primary-screen-replicate-collapsed-logfold-change.csv") %>% as.data.frame()
+treatment.info <- read_csv("primary-screen-replicate-collapsed-treatment-info.csv")%>% as.data.frame()
 
 LFC <- LFC %>% column_to_rownames("X1")
 colnames(LFC) <- treatment.info$broad_id[match(colnames(LFC), treatment.info$column_name)]
 
-cell_line_info <- read_csv("D:/Winnie/Depmap/raw data/sample_info.csv") %>% as.data.frame()
+cell_line_info <- read_csv("sample_info.csv") %>% as.data.frame()
 cell_line_info <- select(cell_line_info, DepMap_ID, stripped_cell_line_name, primary_disease, primary_or_metastasis)
 
 LFC$cancer_type <- cell_line_info$primary_disease[match(rownames(LFC), cell_line_info$DepMap_ID)]
@@ -56,7 +56,7 @@ lineage.enrich[cancer_name,"adj.p"] <- p.adjust(fisher.test(matrix(c(TP, FP, FN,
 cancer_LFC <- Drug_LFC %>% rownames_to_column("gene") %>% 
   filter(cancer_type == "Colon/Colorectal Cancer") %>% 
   column_to_rownames("gene")
-gene_signature <- read_csv("D:/Winnie/Depmap/raw data/CCLE_mutation_Winnie_full.csv")
+gene_signature <- read_csv("CCLE_mutation_Winnie_full.csv")
 gene_signature <- gene_signature %>% column_to_rownames("X1")
 cancer_signature <- gene_signature %>% select(rownames(cancer_LFC))
 
@@ -89,7 +89,7 @@ for (i in 1: length(biomarker$gene)){
 }
 biomarker <- biomarker %>% na.omit()
 significance <- filter(biomarker, wilcox <= 0.05, Median < 0.3)
-#write.csv(significance,"D:/Winnie/Depmap/Duloxetine_CRC_biomarker.csv")
+#write.csv(significance,"Duloxetine_CRC_biomarker.csv")
 
 #Function to draw box plot
 boxplot <- function(a){
@@ -145,7 +145,7 @@ for (i in 1: length(biomarker$gene)){
 }
 biomarker <- biomarker %>% na.omit()
 significance <- filter(biomarker, wilcox <= 0.05, Median < 0.3)
-write.csv(significance,"D:/Winnie/Depmap/Duloxetine_BC_biomarker.csv")
+write.csv(significance,"Duloxetine_BC_biomarker.csv")
 cancer_LFC$cell <- cell_line_info$stripped_cell_line_name[match(rownames(cancer_LFC), cell_line_info$DepMap_ID)]
 
 
