@@ -56,7 +56,7 @@ lineage.enrich[cancer_name,"adj.p"] <- p.adjust(fisher.test(matrix(c(TP, FP, FN,
 cancer_LFC <- Drug_LFC %>% rownames_to_column("gene") %>% 
   filter(cancer_type == "Colon/Colorectal Cancer") %>% 
   column_to_rownames("gene")
-gene_signature <- read_csv("CCLE_mutation_Winnie_full.csv")
+gene_signature <- read_csv("CCLE_mutation_full.csv")
 gene_signature <- gene_signature %>% column_to_rownames("X1")
 cancer_signature <- gene_signature %>% select(rownames(cancer_LFC))
 
